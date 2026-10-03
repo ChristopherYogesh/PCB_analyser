@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pcb_backend
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=pcb-diag-ai-super-secret-key-change-in-production-2026
+      - JWT_SECRET_KEY=jwt-secret-token-key-for-pcb-diagnostics-2026
+      - DATABASE_URL=sqlite:////app/storage/pcb_diagnostics.db
+      - UPLOAD_FOLDER=/app/storage/uploads
+      - DOCUMENTS_FOLDER=/app/storage/documents
+      - REPORTS_FOLDER=/app/storage/reports
+      - BOARD_PROFILES_DIR=/app/board_profiles
+      - AI_PROVIDER=local
+    volumes:
+      - ./storage:/app/storage
+      - ./board_profiles:/app/board_profiles
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pcb_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
